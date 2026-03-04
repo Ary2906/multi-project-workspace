@@ -10,12 +10,19 @@ import { Settings } from './pages/Settings';
 function AppContent({ projects, setProjects, sidebarCollapsed, setSidebarCollapsed }) {
   const [currentPage, setCurrentPage] = useState('/');
   const [settings, setSettings] = useState({
-    theme: 'light',
+    theme: localStorage.getItem('theme') || 'light',
     notifications: true,
     autoSave: true,
     timeFormat: '24h'
   });
   const location = useLocation();
+
+  useEffect(() => {
+    // Apply theme when component mounts or theme changes
+    document.documentElement.setAttribute('data-theme', settings.theme);
+    const accentColor = localStorage.getItem('accentColor') || '#4CAF50';
+    document.documentElement.style.setProperty('--accent-color', accentColor);
+  }, [settings.theme]);
 
   useEffect(() => {
     setCurrentPage(location.pathname);

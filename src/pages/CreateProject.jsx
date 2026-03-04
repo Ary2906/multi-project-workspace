@@ -5,8 +5,32 @@ export const CreateProject = ({ onProjectCreate }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    dueDate: ''
+    dueDate: '',
+    tags: [],
+    customTagInput: '',
+    dropdownValue: ''
   });
+
+  const PREDEFINED_TAGS = ['corporate', 'public', 'personal', 'internship', 'commercial', 'retail'];
+  
+  const DROPDOWN_TAGS = [
+    'urgent',
+    'high-priority',
+    'medium-priority',
+    'low-priority',
+    'frontend',
+    'backend',
+    'database',
+    'api',
+    'testing',
+    'documentation',
+    'bug-fix',
+    'feature',
+    'enhancement',
+    'refactoring',
+    'important',
+    'critical'
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,11 +40,51 @@ export const CreateProject = ({ onProjectCreate }) => {
     }));
   };
 
+  const handleTagFromDropdown = (tag) => {
+    if (tag && !formData.tags.includes(tag)) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, tag],
+        dropdownValue: ''
+      }));
+    }
+  };
+
+  const handleTagToggle = (tag) => {
+    setFormData(prev => {
+      const isSelected = prev.tags.includes(tag);
+      return {
+        ...prev,
+        tags: isSelected 
+          ? prev.tags.filter(t => t !== tag)
+          : [...prev.tags, tag]
+      };
+    });
+  };
+
+  const handleAddCustomTag = () => {
+    const customTag = formData.customTagInput.trim();
+    if (customTag && !formData.tags.includes(customTag)) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, customTag],
+        customTagInput: ''
+      }));
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.name.trim()) {
       onProjectCreate(formData);
-      setFormData({ name: '', description: '', dueDate: '',category: '' });
+      setFormData({ name: '', description: '', dueDate: '', category: '', tags: [], customTagInput: '', dropdownValue: '' });
     }
   };
 
@@ -59,25 +123,70 @@ export const CreateProject = ({ onProjectCreate }) => {
 
           <div className='tags'>
             <div className="form-group">
-              <label htmlFor="tags">Tags</label>
-              <select 
-  id="tags" 
-  name="tags" 
-  multiple 
-  value={formData.tags} // Array of strings
-  onChange={(e) => {
-    const values = Array.from(e.target.selectedOptions, option => option.value);
-    setFormData({ ...formData, tags: values });
-  }}
-  className="form-control"
->
-  <option value="work">work</option>
-  <option value="chill">chill</option>
-  <option value="no work">no work</option>
-  <option value="no chill">no chill</option>
-  <option value="chill chill">chill chill</option>
-  <option value="work work">work work</option>
-</select>
+              <label>Tags</label>
+              
+              <div className="tags-section">
+                {/* Dropdown Tag Selection */}
+                <div className="dropdown-tag-section">
+                  <label className="tags-label">Quick Select Tags:</label>
+                  <select
+                    value={formData.dropdownValue}
+                    onChange={(e) => handleTagFromDropdown(e.target.value)}
+                    className="tag-dropdown"
+                  >
+                    <option value="">Choose a tag from list...</option>
+                    {DROPDOWN_TAGS.map(tag => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Custom Tag Input */}
+                <div className="custom-tag-input">
+                  <label className="tags-label">Add Custom Tag:</label>
+                  <div className="input-group">
+                    <input
+                      type="text"
+                      value={formData.customTagInput}
+                      onChange={(e) => setFormData(prev => ({ ...prev, customTagInput: e.target.value }))}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCustomTag())}
+                      placeholder="Type custom tag and press Enter"
+                      className="custom-tag-input-field"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCustomTag}
+                      className="btn-add-tag"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+
+                {/* Selected Tags Display */}
+                {formData.tags.length > 0 && (
+                  <div className="selected-tags-display">
+                    <label className="tags-label">Selected Tags:</label>
+                    <div className="selected-tags">
+                      {formData.tags.map(tag => (
+                        <div key={tag} className="tag-chip">
+                          <span>{tag}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="btn-remove-tag"
+                            aria-label={`Remove ${tag}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -1,13 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Settings.css';
 
 export const Settings = () => {
   const [settings, setSettings] = useState({
-    theme: 'light',
+    theme: localStorage.getItem('theme') || 'light',
+    accentColor: localStorage.getItem('accentColor') || '#4CAF50',
     notifications: true,
     autoSave: true,
     timeFormat: '24h'
   });
+
+  const ACCENT_COLORS = [
+    '#4CAF50', // Green
+    '#2196F3', // Blue
+    '#FF5722', // Red
+    '#FF9800', // Orange
+    '#FFC107', // Amber
+    '#E91E63', // Pink
+    '#9C27B0', // Purple
+    '#00BCD4', // Cyan
+  ];
+
+  useEffect(() => {
+    // Apply theme to document
+    document.documentElement.setAttribute('data-theme', settings.theme);
+    document.documentElement.style.setProperty('--accent-color', settings.accentColor);
+    
+    // Save to localStorage
+    localStorage.setItem('theme', settings.theme);
+    localStorage.setItem('accentColor', settings.accentColor);
+  }, [settings.theme, settings.accentColor]);
+
+  const handleThemeChange = (theme) => {
+    setSettings(prev => ({
+      ...prev,
+      theme
+    }));
+  };
+
+  const handleAccentColorChange = (color) => {
+    setSettings(prev => ({
+      ...prev,
+      accentColor: color
+    }));
+  };
 
   const handleToggle = (key) => {
     setSettings(prev => ({
@@ -35,19 +71,51 @@ export const Settings = () => {
         <h2>Settings</h2>
         
         <div className="settings-section">
-          <h3>Appearance</h3>
+          <h3>Appearance & Interface</h3>
+          
+          {/* Theme Selection */}
           <div className="settings-item">
-            <label htmlFor="theme">Theme</label>
-            <select 
-              id="theme" 
-              name="theme" 
-              value={settings.theme}
-              onChange={handleSelectChange}
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="auto">Auto</option>
-            </select>
+            <label>Theme</label>
+            <div className="theme-buttons">
+              <button
+                type="button"
+                className={`theme-btn ${settings.theme === 'light' ? 'active' : ''}`}
+                onClick={() => handleThemeChange('light')}
+              >
+                ☀️ Light
+              </button>
+              <button
+                type="button"
+                className={`theme-btn ${settings.theme === 'dark' ? 'active' : ''}`}
+                onClick={() => handleThemeChange('dark')}
+              >
+                🌙 Dark
+              </button>
+              <button
+                type="button"
+                className={`theme-btn ${settings.theme === 'system' ? 'active' : ''}`}
+                onClick={() => handleThemeChange('system')}
+              >
+                ⚙️ System
+              </button>
+            </div>
+          </div>
+
+          {/* Accent Color Selection */}
+          <div className="settings-item">
+            <label>Accent Color</label>
+            <div className="color-palette">
+              {ACCENT_COLORS.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  className={`color-btn ${settings.accentColor === color ? 'active' : ''}`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => handleAccentColorChange(color)}
+                  title={color}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="settings-item">
