@@ -1,11 +1,45 @@
 import { LayoutDashboard, Cog, LayersPlus, FolderOpen, ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+
 import './Sidebar.css';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { PlusCircle, Moon, Sun } from 'lucide-react';
+
+const AppHeader = ({ settings, toggleTheme }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const pageTitle = location.pathname.replace('/', '').replace(/-/g, ' ') || 'dashboard';
+
+    return (
+        <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+                <h1 className="text-2xl font-bold capitalize">{pageTitle}</h1>
+                <p className="text-[var(--text-muted)]">Welcome back, here's what's happening today.</p>
+            </div>
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={toggleTheme}
+                    className="p-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--accent)]"
+                >
+                    {settings.theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                </button>
+                <button onClick={() => navigate('/create')} className="btn-primary flex items-center gap-2">
+                    <PlusCircle size={18} /> <span>New Project</span>
+                </button>
+            </div>
+        </header>
+    );
+};
+
+export default AppHeader;
+
 
 export const Sidebar = ({ currentPage, navClick, onCollapsedChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+  
 
   const handleCollapseToggle = (collapsed) => {
     setIsCollapsed(collapsed);
@@ -15,33 +49,34 @@ export const Sidebar = ({ currentPage, navClick, onCollapsedChange }) => {
   };
 
   const menuItems = [
-    { label: 'Dashboard', page: 'dashboard', icon: <LayoutDashboard size={20} /> },
+    { label: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
     {
       label: 'Projects',
       path: '/projects',
       icon: <FolderOpen size={20} />,
       children: [
-        { label: 'All Projects', path: '/projects/all', page: 'projects-all' },
-        { label: 'Active', path: '/projects/active', page: 'projects-active' },
-        { label: 'Archived', path: '/projects/archived', page: 'projects-archived' }
+        { label: 'All Projects', path: '/projects/all' },
+        { label: 'Active', path: '/projects/active' },
+        { label: 'Archived', path: '/projects/archived' }
       ]
     },
-    { label: 'Create Project', page: 'create', icon: <LayersPlus size={20} /> },
-    { label: 'Settings', page: 'settings', icon: <Cog size={20} /> }
+    { label: 'Create Project', path: '/create', icon: <LayersPlus size={20} /> },
+    { label: 'Settings', path: '/settings', icon: <Cog size={20} /> }
   ];
 
   const SidebarItem = ({ item }) => {
     const hasChildren = item.children && item.children.length > 0;
 
     return (
-      <div key={item.page || item.path}>
+      <div key={item.path}>
         <button
-          className={`sidebar-link ${currentPage === item.page ? 'active' : ''}`}
+          className={`sidebar-link ${currentPage === item.path ? 'active' : ''}`}
           onClick={() => {
             if (hasChildren) {
               setExpandedMenu(expandedMenu === item.path ? null : item.path);
             } else {
-              navClick(item.page);
+              navigate(item.path);
+              navClick && navClick(item.path);
               setIsOpen(false);
             }
           }}
@@ -60,12 +95,13 @@ export const Sidebar = ({ currentPage, navClick, onCollapsedChange }) => {
           <div className="sidebar-submenu">
             {item.children.map(child => (
               <button
-                key={child.page}
+                key={child.path}
                 className={`sidebar-link submenu-link ${
-                  currentPage === child.page ? 'active' : ''
+                  currentPage === child.path ? 'active' : ''
                 }`}
                 onClick={() => {
-                  navClick(child.page);
+                  navigate(child.path);
+                  navClick && navClick(child.path);
                   setIsOpen(false);
                 }}
                 title={child.label}

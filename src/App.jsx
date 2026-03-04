@@ -1,16 +1,32 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import { Sidebar } from './components/Sidebar';
+import { AppHeader } from './components/AppHeader';
 import { Dashboard } from './pages/Dashboard';
+import { CreateProject } from './pages/CreateProject';
+import { Settings } from './pages/Settings';
 
+function AppContent({ projects, setProjects, sidebarCollapsed, setSidebarCollapsed }) {
+  const [currentPage, setCurrentPage] = useState('/');
+  const [settings, setSettings] = useState({
+    theme: 'light',
+    notifications: true,
+    autoSave: true,
+    timeFormat: '24h'
+  });
+  const location = useLocation();
 
+  useEffect(() => {
+    setCurrentPage(location.pathname);
+  }, [location.pathname]);
 
-function App() {
- 
-  const [currentPage, setCurrentPage] = useState('dashboard');
-  const [projects, setProjects] = useState([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const toggleTheme = () => {
+    setSettings(prev => ({
+      ...prev,
+      theme: prev.theme === 'light' ? 'dark' : 'light'
+    }));
+  };
 
   const handleSidebarMenuClick = (page) => {
     setCurrentPage(page);
@@ -41,79 +57,101 @@ function App() {
   };
 
   return (
-    <Router>
-      <div>
-        <Sidebar 
-          currentPage={currentPage} 
-          navClick={handleSidebarMenuClick}
-          onCollapsedChange={handleSidebarCollapsed}
-        />
+    <div style={{ display: 'flex' }}>
+      <Sidebar 
+        currentPage={currentPage} 
+        navClick={handleSidebarMenuClick}
+        onCollapsedChange={handleSidebarCollapsed}
+      />
 
-        <div style={{ 
-          marginLeft: sidebarCollapsed ? '80px' : '280px', 
-          minHeight: '100vh',
-          transition: 'margin-left 0.3s ease'
-        }}>
-          {/* main content header */}
-          <div style={{ padding: '20px', borderBottom: '1px solid #e0e5f2' }}>
-            <h1>{currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}</h1>
-          </div>
+      <div style={{ 
+        marginLeft: sidebarCollapsed ? '80px' : '280px', 
+        minHeight: '100vh',
+        transition: 'margin-left 0.3s ease',
+        width: '100%',
+      }}>
+        {/* main content header */}
+        <AppHeader settings={settings} toggleTheme={toggleTheme} />
 
-          {/* main content body */}
-          <div>
-            <Routes>
-              <Route 
-                path="/" 
-                element={
-                  <Dashboard 
-                    projects={projects}
-                    removeProject={removeProject}
-                    updateProject={updateProject}
-                    status="all"
-                  />
-                } 
-              />
-              <Route
-                path="/projects/all"
-                element={
-                  <Dashboard
-                    projects={projects}
-                    removeProject={removeProject}
-                    updateProject={updateProject}
-                    status="all"
-                  />
-                }
-              />
-              <Route
-                path="/projects/active"
-                element={
-                  <Dashboard
-                    projects={projects}
-                    removeProject={removeProject}
-                    updateProject={updateProject}
-                    status="active"
-                  />
-                }
-              />
-              <Route
-                path="/projects/archived"
-                element={
-                  <Dashboard
-                    projects={projects}
-                    removeProject={removeProject}
-                    updateProject={updateProject}
-                    status="archived"
-                  />
-                }
-              />
-              <Route path="/create" element={<div>Create Project Page (to be implemented)</div>} />
-              <Route path="/settings" element={<div>Settings Page (to be implemented)</div>} />
-            </Routes>
-          </div>
-
+        {/* main content body */}
+        <div>
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <Dashboard 
+                  projects={projects}
+                  removeProject={removeProject}
+                  updateProject={updateProject}
+                  status="all"
+                />
+              } 
+            />
+            <Route
+              path="/projects/all"
+              element={
+                <Dashboard
+                  projects={projects}
+                  removeProject={removeProject}
+                  updateProject={updateProject}
+                  status="all"
+                />
+              }
+            />
+            <Route
+              path="/projects/active"
+              element={
+                <Dashboard
+                  projects={projects}
+                  removeProject={removeProject}
+                  updateProject={updateProject}
+                  status="active"
+                />
+              }
+            />
+            <Route
+              path="/projects/archived"
+              element={
+                <Dashboard
+                  projects={projects}
+                  removeProject={removeProject}
+                  updateProject={updateProject}
+                  status="archived"
+                />
+              }
+            />
+            <Route 
+              path="/create" 
+              element={
+                <CreateProject 
+                  onProjectCreate={addProject}
+                />
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={<Settings />} 
+            />
+          </Routes>
         </div>
 
       </div>
+    </div>
+  );
+}
+
+function App() {
+  const [projects, setProjects] = useState([]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  return (
+    <Router>
+      <AppContent 
+        projects={projects} 
+        setProjects={setProjects}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
+      />
     </Router>
   );
 }
