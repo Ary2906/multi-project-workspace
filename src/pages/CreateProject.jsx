@@ -136,7 +136,7 @@ export const CreateProject = ({ onProjectCreate }) => {
                   >
                     <option value="">Choose a tag from list...</option>
                     {DROPDOWN_TAGS.map(tag => (
-                      <option key={tag} value={tag}>
+                      <option key={tag} value={tag} style={formData.tags.includes(tag) ? { backgroundColor: 'lightgray', color: 'black' } : {}}>
                         {tag}
                       </option>
                     ))}
