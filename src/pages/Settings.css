@@ -1,0 +1,290 @@
+.settings-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.settings-card {
+  background: var(--bg-sidebar);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-card h2 {
+  color: var(--text-main);
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.settings-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-section:last-of-type {
+  border-bottom: none;
+}
+
+.settings-section h3 {
+  color: var(--text-main);
+  font-size: 16px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-item label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* Theme Buttons */
+.theme-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.theme-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px 16px;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.theme-btn:hover {
+  border-color: var(--accent-color);
+  background-color: var(--bg-tertiary);
+}
+
+.theme-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Color Palette */
+.color-palette {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.color-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.color-btn:hover {
+  border-color: #333;
+  transform: scale(1.1);
+}
+
+.color-btn.active {
+  border-color: #333;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+}
+
+
+
+.settings-item select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: var(--bg-sidebar);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.settings-item select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.settings-item.toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--accent-color);
+}
+
+.btn-save {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 20px;
+}
+
+.btn-save:hover {
+  opacity: 0.9;
+}
+
+.btn-save:active {
+  transform: scale(0.98);
+}
+
+/* ── Custom Tags CRUD ── */
+.custom-tags-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.custom-tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+}
+
+.tag-pill {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-main);
+  padding: 4px 10px;
+  background: var(--bg-tertiary);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  display: inline-block;
+}
+
+.tag-edit-input {
+  flex: 1;
+  padding: 5px 10px;
+  border: 1.5px solid var(--accent-color);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg-sidebar);
+  color: var(--text-main);
+  outline: none;
+}
+
+.tag-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.tag-action-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.tag-action-btn:hover {
+  opacity: 0.85;
+  transform: scale(1.08);
+}
+
+.tag-edit-btn {
+  background: #4f8ef7;
+  color: #fff;
+}
+
+.tag-delete-btn {
+  background: #e05252;
+  color: #fff;
+}
+
+.tag-save-btn {
+  background: #4CAF50;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Add New Tag row */
+.add-new-tag-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.add-tag-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1.5px dashed var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg-sidebar);
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.add-tag-input:focus {
+  border-color: var(--accent-color);
+  border-style: solid;
+}
+
+.btn-add-new-tag {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-add-new-tag:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  border-style: solid;
+}
+
