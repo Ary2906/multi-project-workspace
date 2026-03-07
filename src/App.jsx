@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { Sidebar } from './components/Sidebar';
 import { AppHeader } from './components/AppHeader';
 import { Dashboard } from './pages/Dashboard';
-import { CreateProject } from './pages/CreateProject';
+import { CreateProjectNew } from './pages/CreateProjectNew';
+import { ProjectDetails } from './pages/ProjectDetails';
 import { Settings } from './pages/Settings';
 
 function AppContent({ projects, setProjects, sidebarCollapsed, setSidebarCollapsed }) {
@@ -130,8 +131,17 @@ function AppContent({ projects, setProjects, sidebarCollapsed, setSidebarCollaps
             <Route 
               path="/create" 
               element={
-                <CreateProject 
+                <CreateProjectNew 
                   onProjectCreate={addProject}
+                />
+              } 
+            />
+            <Route 
+              path="/edit-project/:projectId" 
+              element={
+                <ProjectDetails
+                  projects={projects}
+                  updateProject={updateProject}
                 />
               } 
             />
