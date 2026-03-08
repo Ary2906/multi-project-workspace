@@ -12,18 +12,17 @@ export const Settings = () => {
   });
 
   // CRUD State for project and task configurations
-  const [projectCategories, setProjectCategories] = useState(
-    JSON.parse(localStorage.getItem('projectCategories')) || []
-  );
-  const [projectTags, setProjectTags] = useState(
-    JSON.parse(localStorage.getItem('projectTags')) || []
-  );
+  const [projectCategories, setProjectCategories] = useState([]);
+  const [projectTags, setProjectTags] = useState([]);
   const [projectStatus, setProjectStatus] = useState(
     JSON.parse(localStorage.getItem('projectStatus')) || []
   );
-  const [taskStatus, setTaskStatus] = useState(
-    JSON.parse(localStorage.getItem('taskStatus')) || []
-  );
+  const [taskStatus, setTaskStatus] = useState([
+    'Active',
+    'Inactive',
+    'Blocked',
+    'Done'
+  ]);
 
   // Input states for CRUD forms
   const [inputValues, setInputValues] = useState({
@@ -72,13 +71,46 @@ export const Settings = () => {
     localStorage.setItem('defaultTaskStatus', settings.defaultTaskStatus);
   }, [settings]);
 
+  // Fetch tags, categories, and task statuses from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch tags
+        const tagsResponse = await fetch('http://localhost:5000/api/tags');
+        if (tagsResponse.ok) {
+          const tags = await tagsResponse.json();
+          setProjectTags(tags);
+          console.log('Fetched tags from server:', tags);
+        }
+
+        // Fetch categories
+        const categoriesResponse = await fetch('http://localhost:5000/api/categories');
+        if (categoriesResponse.ok) {
+          const categories = await categoriesResponse.json();
+          setProjectCategories(categories);
+          console.log('Fetched categories from server:', categories);
+        }
+
+        // Fetch task statuses
+        const taskStatusesResponse = await fetch('http://localhost:5000/api/tasks/statuses');
+        if (taskStatusesResponse.ok) {
+          const statuses = await taskStatusesResponse.json();
+          setTaskStatus(statuses);
+          console.log('Fetched task statuses from server:', statuses);
+        }
+      } catch (error) {
+        console.error('Error fetching data from server:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // Save CRUD items to localStorage
   useEffect(() => {
-    localStorage.setItem('projectCategories', JSON.stringify(projectCategories));
-    localStorage.setItem('projectTags', JSON.stringify(projectTags));
     localStorage.setItem('projectStatus', JSON.stringify(projectStatus));
     localStorage.setItem('taskStatus', JSON.stringify(taskStatus));
-  }, [projectCategories, projectTags, projectStatus, taskStatus]);
+  }, [projectStatus, taskStatus]);
 
   const handleThemeChange = (theme) => {
     setSettings(prev => ({
@@ -110,31 +142,63 @@ export const Settings = () => {
 
   // CRUD Helper Functions
   const getCRUDList = (listName) => {
-    const lists = {
-      projectCategories,
-      projectTags,
-      projectStatus,
-      taskStatus
-    };
+    const lists = { projectCategories, projectTags, projectStatus, taskStatus };
     return lists[listName] || [];
   };
 
   const setCRUDList = (listName, newList) => {
-    if (listName === 'projectCategories') setProjectCategories(newList);
-    else if (listName === 'projectTags') setProjectTags(newList);
-    else if (listName === 'projectStatus') setProjectStatus(newList);
-    else if (listName === 'taskStatus') setTaskStatus(newList);
+    const setters = {
+      projectCategories: setProjectCategories,
+      projectTags: setProjectTags,
+      projectStatus: setProjectStatus,
+      taskStatus: setTaskStatus
+    };
+    setters[listName]?.(newList);
   };
 
   const addItem = (listName) => {
     const value = inputValues[listName].trim();
     if (!value) return;
-    setCRUDList(listName, [...getCRUDList(listName), value]);
+    
+    // For task statuses, also sync with backend
+    if (listName === 'taskStatus') {
+      fetch('http://localhost:5000/api/tasks/statuses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: value })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.taskStatuses) {
+            setTaskStatus(data.taskStatuses);
+          }
+        })
+        .catch(err => console.error('Error adding task status:', err));
+    } else {
+      setCRUDList(listName, [...getCRUDList(listName), value]);
+    }
+    
     setInputValues(prev => ({ ...prev, [listName]: '' }));
   };
 
   const deleteItem = (listName, index) => {
-    setCRUDList(listName, getCRUDList(listName).filter((_, i) => i !== index));
+    const itemToDelete = getCRUDList(listName)[index];
+    
+    // For task statuses, also sync with backend
+    if (listName === 'taskStatus') {
+      fetch(`http://localhost:5000/api/tasks/statuses/${encodeURIComponent(itemToDelete)}`, {
+        method: 'DELETE'
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.taskStatuses) {
+            setTaskStatus(data.taskStatuses);
+          }
+        })
+        .catch(err => console.error('Error deleting task status:', err));
+    } else {
+      setCRUDList(listName, getCRUDList(listName).filter((_, i) => i !== index));
+    }
   };
 
   const startEdit = (listName, index, currentValue) => {
@@ -151,8 +215,27 @@ export const Settings = () => {
     const newValue = editValues[listName].trim();
     if (!newValue) return;
     const list = getCRUDList(listName);
-    setCRUDList(listName, list.map((item, i) => i === index ? newValue : item));
-    cancelEdit(listName);
+    const oldValue = list[index];
+    
+    // For task statuses, also sync with backend
+    if (listName === 'taskStatus') {
+      fetch(`http://localhost:5000/api/tasks/statuses/${encodeURIComponent(oldValue)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newValue })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.taskStatuses) {
+            setTaskStatus(data.taskStatuses);
+            cancelEdit(listName);
+          }
+        })
+        .catch(err => console.error('Error updating task status:', err));
+    } else {
+      setCRUDList(listName, list.map((item, i) => i === index ? newValue : item));
+      cancelEdit(listName);
+    }
   };
 
   const handleInputChange = (e, listName) => {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Briefcase, DollarSign, Layers, Edit2, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
@@ -9,18 +9,56 @@ export const Dashboard = ({ projects = [], removeProject, updateProject, status 
   const [filterStatus, setFilterStatus] = useState('');
   const [filterTag, setFilterTag] = useState('');
 
+  // Fetch categories, project statuses, and tags from backend
+  const [availableCategories, setAvailableCategories] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [availableStatuses, setAvailableStatuses] = useState([]);
+
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      try {
+        // Fetch categories
+        const categoriesResponse = await fetch('http://localhost:5000/api/categories');
+        if (categoriesResponse.ok) {
+          const categories = await categoriesResponse.json();
+          setAvailableCategories(categories);
+        }
+
+        // Fetch tags
+        const tagsResponse = await fetch('http://localhost:5000/api/tags');
+        if (tagsResponse.ok) {
+          const tags = await tagsResponse.json();
+          setAvailableTags(tags);
+        }
+      } catch (error) {
+        console.error('Error fetching filter data:', error);
+      }
+    };
+
+    fetchFilterData();
+  }, []);
+
   // Get unique categories, statuses, and tags from projects
   const uniqueCategories = useMemo(() => {
+    if (availableCategories.length > 0) {
+      return availableCategories;
+    }
     const cats = new Set(projects.map(p => p.category).filter(Boolean));
     return Array.from(cats).sort();
-  }, [projects]);
+  }, [projects, availableCategories]);
 
   const uniqueProjectStatuses = useMemo(() => {
+    if (availableStatuses.length > 0) {
+      return availableStatuses;
+    }
     const statuses = new Set(projects.map(p => p.projectStatus).filter(Boolean));
     return Array.from(statuses).sort();
-  }, [projects]);
+  }, [projects, availableStatuses]);
 
   const uniqueTags = useMemo(() => {
+    if (availableTags.length > 0) {
+      return availableTags;
+    }
     const tags = new Set();
     projects.forEach(p => {
       if (p.tags && Array.isArray(p.tags)) {
@@ -28,7 +66,7 @@ export const Dashboard = ({ projects = [], removeProject, updateProject, status 
       }
     });
     return Array.from(tags).sort();
-  }, [projects]);
+  }, [projects, availableTags]);
 
   const filteredProjects = useMemo(() => {
     if (!projects) return [];

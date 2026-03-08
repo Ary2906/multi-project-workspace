@@ -86,38 +86,6 @@
   border-color: var(--accent-color);
 }
 
-/* Density Buttons */
-.density-buttons {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
-.density-btn {
-  flex: 1;
-  padding: 12px 16px;
-  background-color: var(--bg-secondary);
-  border: 2px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: all 0.2s;
-  text-align: center;
-}
-
-.density-btn:hover {
-  border-color: var(--accent-color);
-  background-color: var(--bg-tertiary);
-}
-
-.density-btn.active {
-  background-color: var(--accent-color);
-  color: white;
-  border-color: var(--accent-color);
-}
-
 /* Color Palette */
 .color-palette {
   display: grid;
@@ -188,28 +156,66 @@
   border-color: var(--accent-color);
 }
 
+/* CRUD Section Container */
+.crud-section {
+  margin-bottom: 24px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.crud-section:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.crud-section-title {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.crud-section-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 18px;
+  background: linear-gradient(135deg, var(--accent-color), #7e57c2);
+  border-radius: 2px;
+  margin-right: 10px;
+}
+
 /* CRUD Input Group */
 .crud-input-group {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .crud-input {
   flex: 1;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
+  padding: 12px 14px;
+  border: 2px solid var(--border);
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 14px;
   background-color: var(--bg-sidebar);
   color: var(--text-main);
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .crud-input:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  background-color: var(--bg-sidebar);
 }
 
 .crud-input::placeholder {
@@ -217,122 +223,220 @@
 }
 
 .crud-add-btn {
-  padding: 10px 18px;
-  background-color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--accent-color), #7e57c2);
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 18px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
-  font-weight: bold;
-  line-height: 1;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .crud-add-btn:hover {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .crud-add-btn:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
-/* CRUD Items Container */
-.crud-items {
+.plus-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* CRUD List Container */
+.crud-list-container {
+  background: var(--bg-sidebar);
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  min-height: 60px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
 }
 
-/* CRUD Badge/Item */
-.crud-badge {
-  display: inline-flex;
+/* CRUD Items Grid */
+.crud-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+/* Individual CRUD Item Card */
+.crud-item-card {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 20px;
-  font-size: 13px;
-  animation: slideIn 0.2s ease-out;
+  justify-content: space-between;
+  padding: 14px 12px;
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  gap: 8px;
+  min-height: 44px;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.crud-item-card:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
 }
 
-.crud-edit-input-inline {
-  padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  font-size: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  min-width: 100px;
+.crud-item-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.crud-item-text {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+/* CRUD Item Edit Mode */
+.crud-item-edit-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
   flex: 1;
 }
 
-.crud-edit-input-inline:focus {
+.crud-item-edit-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid var(--accent-color);
+  border-radius: 4px;
+  font-size: 13px;
+  background-color: var(--bg-sidebar);
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+.crud-item-edit-input:focus {
   outline: none;
-  border-color: white;
-  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
 }
 
-.crud-edit-input-inline::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-/* Action Buttons */
-.action-btn {
+/* CRUD Action Buttons */
+.crud-item-actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
+  gap: 6px;
   flex-shrink: 0;
 }
 
-.action-btn:hover {
-  transform: scale(1.15);
+.crud-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.action-btn.edit {
-  opacity: 0.8;
+.crud-action-btn:hover {
+  transform: scale(1.1);
+  background: var(--bg-tertiary);
 }
 
-.action-btn.edit:hover {
-  opacity: 1;
+.crud-action-btn.edit {
+  color: #2196F3;
 }
 
-.action-btn.delete {
+.crud-action-btn.edit:hover {
+  background: rgba(33, 150, 243, 0.1);
+  border-color: #2196F3;
+}
+
+.crud-action-btn.delete {
+  color: #f44336;
+}
+
+.crud-action-btn.delete:hover {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: #f44336;
+}
+
+.crud-action-btn.save {
+  color: #4CAF50;
+}
+
+.crud-action-btn.save:hover {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: #4CAF50;
+}
+
+.crud-action-btn.cancel {
+  color: #ff9800;
+}
+
+.crud-action-btn.cancel:hover {
+  background: rgba(255, 152, 0, 0.1);
+  border-color: #ff9800;
+}
+
+/* Empty State */
+.crud-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+
+.crud-empty-state p {
+  margin: 0;
   opacity: 0.7;
 }
 
-.action-btn.delete:hover {
-  opacity: 1;
-  color: #ff6b6b;
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .crud-items {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
 
-.action-btn.save {
-  opacity: 0.8;
-}
+  .crud-item-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+  }
 
-.action-btn.save:hover {
-  opacity: 1;
+  .crud-item-content {
+    width: 100%;
+  }
+
+  .crud-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 @keyframes slideIn {
@@ -346,26 +450,4 @@
   }
 }
 
-.crud-delete-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  background-color: transparent;
-  border: none;
-  color: #ff6b6b;
-  font-size: 14px;
-  cursor: pointer;
-  transition: color 0.2s;
-  flex-shrink: 0;
-}
-
-.crud-delete-btn:hover {
-  color: #ff4444;
-}
-
-.crud-delete-btn:active {
-  transform: scale(1.2);
-}
+/* END OF SETTINGS STYLES */

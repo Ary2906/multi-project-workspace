@@ -5,6 +5,7 @@ import './CreateProjectNew.css';
 export const CreateProjectNew = ({ onProjectCreate }) => {
   const [formData, setFormData] = useState({
     name: '',
+    category: '',
     tags: [],
     dueDate: '',
     totalBudgetGoal: 0,
@@ -17,7 +18,7 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
   const [phaseIdCounter, setPhaseIdCounter] = useState(2);
   const [taskIdCounter, setTaskIdCounter] = useState(1);
 
-  // Load dynamic data from localStorage
+  // Load dynamic data from localhost
   const [projectTags, setProjectTags] = useState([
     'urgent', 'high-priority', 'medium-priority', 'low-priority',
     'frontend', 'backend', 'database', 'api', 'testing',
@@ -25,12 +26,52 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
     'important', 'critical'
   ]);
 
+  const [projectCategories, setProjectCategories] = useState([
+    'frontend', 'backend', 'database', 'api', 'testing',
+    'documentation', 'devops', 'design', 'mobile', 'other'
+  ]);
+
   useEffect(() => {
-    const savedTags = JSON.parse(localStorage.getItem('projectTags')) || [];
+      const fetchTags = async () => {
+        try {
+          const response = await fetch('http://localhost:5000/api/tags');
+          if (response.ok) {
+            const tags = await response.json();
+            console.log('Fetched tags from server:', tags);
+            setProjectTags(tags);
+          }
+        } catch (error) {
+          console.error('Error fetching tags:', error);
+        }
+      };
+
+      const fetchCategories = async () => {
+        try {
+          const response = await fetch('http://localhost:5000/api/categories');
+          if (response.ok) {
+            const categories = await response.json();
+            console.log('Fetched categories from server:', categories);
+            setProjectCategories(categories);
+          }
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+        }
+      };
+
+      fetchTags();
+      fetchCategories();
+
+      const savedTags = JSON.parse(localStorage.getItem('projectTags')) || [];
     if (savedTags.length > 0) {
       setProjectTags(savedTags);
     }
-  }, []);
+    }, []);
+
+    // const savedTags = JSON.parse(localStorage.getItem('projectTags')) || [];
+    // if (savedTags.length > 0) {
+    //   setProjectTags(savedTags);
+    // }
+  // }, []);
 
   // Calculate allocated budget
   const allocatedBudget = formData.phases.reduce((sum, phase) => sum + phase.total, 0);
@@ -158,6 +199,7 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
       });
       setFormData({
         name: '',
+        category: '',
         tags: [],
         dueDate: '',
         totalBudgetGoal: 0,
@@ -197,6 +239,22 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
               </div>
 
               <div className="form-group">
+                <label htmlFor="category">Category</label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="category-dropdown"
+                >
+                  <option value="">Select Category...</option>
+                  {projectCategories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
                 <label>Tag</label>
                 <select
                   value={formData.dropdownValue}
@@ -225,6 +283,19 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
                   </div>
                 )}
               </div>
+              <div className="form-group">
+                <label htmlFor="customTagInput">Custom Tag</label>
+                <input
+                  type="text"
+                  id="customTagInput"
+                  name="customTagInput"
+                  value={formData.customTagInput}
+                  onChange={handleChange}
+                  placeholder="Enter custom tag"
+                />
+              </div>
+
+              
 
               <div className="form-group">
                 <label htmlFor="dueDate">Overall Project Deadline</label>
