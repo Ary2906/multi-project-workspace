@@ -26,6 +26,7 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
   ]);
 
   useEffect(() => {
+    
     const savedTags = JSON.parse(localStorage.getItem('projectTags')) || [];
     if (savedTags.length > 0) {
       setProjectTags(savedTags);
@@ -121,8 +122,14 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
     setTaskIdCounter(taskIdCounter + 1);
     setFormData(prev => {
       const newPhases = [...prev.phases];
-      newPhases[phaseIndex].tasks.push(newTask);
-      newPhases[phaseIndex].total = newPhases[phaseIndex].tasks.reduce((sum, t) => sum + parseFloat(t.cost || 0), 0);
+      // Create a copy of the phase and tasks to avoid mutation
+      newPhases[phaseIndex] = {
+        ...newPhases[phaseIndex],
+        tasks: [...newPhases[phaseIndex].tasks, newTask]
+      };
+      newPhases[phaseIndex].total = newPhases[phaseIndex].tasks.reduce(
+        (sum, t) => sum + parseFloat(t.cost || 0), 0
+      );
       return { ...prev, phases: newPhases };
     });
   };
