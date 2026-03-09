@@ -13,6 +13,13 @@ export const CRUDSection = ({
   onUpdateItem,
   onCancelEdit
 }) => {
+  // Helper function to get display value from item
+  const getItemValue = (item) => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item.name) return item.name;
+    return '';
+  };
+
   return (
     <div className="crud-section">
       <h3 className="crud-section-title">{label}</h3>
@@ -77,13 +84,13 @@ export const CRUDSection = ({
                 ) : (
                   <>
                     <div className="crud-item-content">
-                      <span className="crud-item-text">{item}</span>
+                      <span className="crud-item-text">{getItemValue(item)}</span>
                     </div>
                     <div className="crud-item-actions">
                       <button
                         type="button"
                         className="crud-action-btn edit"
-                        onClick={() => onStartEdit(listName, index, item)}
+                        onClick={() => onStartEdit(listName, index, getItemValue(item))}
                         title="Edit item"
                       >
                         ✎

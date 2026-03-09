@@ -3,43 +3,12 @@ import { useState } from 'react';
 
 import './Sidebar.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PlusCircle, Moon, Sun } from 'lucide-react';
-
-const AppHeader = ({ settings, toggleTheme }) => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const pageTitle = location.pathname.replace('/', '').replace(/-/g, ' ') || 'dashboard';
-
-    return (
-        <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-            <div>
-                <h1 className="text-2xl font-bold capitalize">{pageTitle}</h1>
-                <p className="text-[var(--text-muted)]">Welcome back, here's what's happening today.</p>
-            </div>
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={toggleTheme}
-                    className="p-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--accent)]"
-                >
-                    {settings.theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-                </button>
-                <button onClick={() => navigate('/create')} className="btn-primary flex items-center gap-2">
-                    <PlusCircle size={18} /> <span>New Project</span>
-                </button>
-            </div>
-        </header>
-    );
-};
-
-export default AppHeader;
-
 
 export const Sidebar = ({ currentPage, navClick, onCollapsedChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
-  
 
   const handleCollapseToggle = (collapsed) => {
     setIsCollapsed(collapsed);

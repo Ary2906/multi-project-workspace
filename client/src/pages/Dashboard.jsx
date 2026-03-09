@@ -41,7 +41,7 @@ export const Dashboard = ({ projects = [], removeProject, updateProject, status 
   // Get unique categories, statuses, and tags from projects
   const uniqueCategories = useMemo(() => {
     if (availableCategories.length > 0) {
-      return availableCategories;
+      return availableCategories.map(cat => typeof cat === 'string' ? cat : cat.name).filter(Boolean);
     }
     const cats = new Set(projects.map(p => p.category).filter(Boolean));
     return Array.from(cats).sort();
@@ -57,12 +57,12 @@ export const Dashboard = ({ projects = [], removeProject, updateProject, status 
 
   const uniqueTags = useMemo(() => {
     if (availableTags.length > 0) {
-      return availableTags;
+      return availableTags.map(tag => typeof tag === 'string' ? tag : tag.name).filter(Boolean);
     }
     const tags = new Set();
     projects.forEach(p => {
       if (p.tags && Array.isArray(p.tags)) {
-        p.tags.forEach(tag => tags.add(tag));
+        p.tags.forEach(tag => tags.add(typeof tag === 'string' ? tag : tag.name));
       }
     });
     return Array.from(tags).sort();

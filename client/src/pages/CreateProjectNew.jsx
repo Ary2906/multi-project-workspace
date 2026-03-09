@@ -5,6 +5,7 @@ import './CreateProjectNew.css';
 export const CreateProjectNew = ({ onProjectCreate }) => {
   const [formData, setFormData] = useState({
     name: '',
+    description: '',
     category: '',
     tags: [],
     dueDate: '',
@@ -38,7 +39,11 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
           if (response.ok) {
             const tags = await response.json();
             console.log('Fetched tags from server:', tags);
-            setProjectTags(tags);
+            // Handle both array of strings and array of objects
+            const tagNames = tags.map(tag => typeof tag === 'string' ? tag : tag.name).filter(Boolean);
+            if (tagNames.length > 0) {
+              setProjectTags(tagNames);
+            }
           }
         } catch (error) {
           console.error('Error fetching tags:', error);
@@ -51,7 +56,11 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
           if (response.ok) {
             const categories = await response.json();
             console.log('Fetched categories from server:', categories);
-            setProjectCategories(categories);
+            // Handle both array of strings and array of objects
+            const categoryNames = categories.map(cat => typeof cat === 'string' ? cat : cat.name).filter(Boolean);
+            if (categoryNames.length > 0) {
+              setProjectCategories(categoryNames);
+            }
           }
         } catch (error) {
           console.error('Error fetching categories:', error);
@@ -189,26 +198,74 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.name.trim()) {
-      onProjectCreate({
-        ...formData,
-        allocatedBudget,
-        activeTaskCount
-      });
-      setFormData({
-        name: '',
-        category: '',
-        tags: [],
-        dueDate: '',
-        totalBudgetGoal: 0,
-        phases: [{ id: 1, name: 'Phase 1', tasks: [], total: 0 }],
-        customTagInput: '',
-        dropdownValue: ''
-      });
-      setPhaseIdCounter(2);
-      setTaskIdCounter(1);
+      const projectData = {
+        project_name: formData.name,
+        description: formData.description || '',
+        category: formData.category || 'uncategorized',
+        budget: formData.totalBudgetGoal || 0,
+        tags: formData.tags || [],
+        project_status: formData.project_status || 'pending',
+        due_date: formData.dueDate || null,
+        tasks: formData.phases.flatMap(phase => 
+          phase.tasks.map(task => ({
+            title: task.name,
+            status: task.status || 'Active',
+            cost: parseFloat(task.cost || 0)
+          }))
+        ) || []
+      };
+
+      try {
+        // Save to MongoDB via backend API
+        const response = await fetch('http://localhost:5000/api/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(projectData)
+        });
+
+        const result = await response.json();
+        console.log('Response from server:', result, 'Status:', response.status);
+
+        if (response.ok) {
+          console.log('Project saved to MongoDB:', result);
+          
+          // Also update local state for immediate UI feedback
+          onProjectCreate({
+            ...formData,
+            allocatedBudget,
+            activeTaskCount,
+            _id: result.project?._id
+          });
+
+          // Reset form
+          setFormData({
+            name: '',
+            description: '',
+            category: '',
+            tags: [],
+            dueDate: '',
+            totalBudgetGoal: 0,
+            phases: [{ id: 1, name: 'Phase 1', tasks: [], total: 0 }],
+            customTagInput: '',
+            dropdownValue: '',
+            project_status: 'pending'
+          });
+          setPhaseIdCounter(2);
+          setTaskIdCounter(1);
+          alert('Project created successfully!');
+        } else {
+          console.error('Server returned error:', result);
+          alert('Failed to save project: ' + (result.message || response.statusText));
+        }
+      } catch (error) {
+        console.error('Error saving project:', error);
+        alert('Error saving project: ' + error.message);
+      }
     }
   };
 
@@ -235,6 +292,19 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
                   onChange={handleChange}
                   placeholder="e.g., Zenith Product Launch"
                   required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">Project Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description || ''}
+                  onChange={handleChange}
+                  placeholder="Describe your project..."
+                  rows="3"
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid var(--border)' }}
                 />
               </div>
 

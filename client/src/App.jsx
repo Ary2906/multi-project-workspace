@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 
 import { Sidebar } from './components/Sidebar';
 import { AppHeader } from './components/AppHeader';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Dashboard } from './pages/Dashboard';
 import { CreateProjectNew } from './pages/CreateProjectNew';
 import { ProjectDetails } from './pages/ProjectDetails';
@@ -46,7 +47,7 @@ function AppContent({ projects, setProjects, sidebarCollapsed, setSidebarCollaps
 
   const addProject = (project) => {
     const newProject = {
-      id: Date.now(),
+      id: project._id || Date.now(),
       ...project,
       archived: false,
       createdAt: new Date()
@@ -54,11 +55,33 @@ function AppContent({ projects, setProjects, sidebarCollapsed, setSidebarCollaps
     setProjects(prev => [...prev, newProject]);
   };
 
-  const removeProject = (id) => {
+  const removeProject = async (id) => {
+    try {
+      // Delete from MongoDB
+      await fetch(`http://localhost:5000/api/projects/${id}`, {
+        method: 'DELETE'
+      });
+    } catch (error) {
+      console.error('Error deleting project:', error);
+    }
+    // Update local state
     setProjects(prev => prev.filter(p => p.id !== id));
   };
 
-  const updateProject = (id, updates) => {
+  const updateProject = async (id, updates) => {
+    try {
+      // Update in MongoDB
+      await fetch(`http://localhost:5000/api/projects/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      });
+    } catch (error) {
+      console.error('Error updating project:', error);
+    }
+    // Update local state
     setProjects(prev =>
       prev.map(p => (p.id === id ? { ...p, ...updates } : p))
     );
@@ -161,15 +184,48 @@ function App() {
   const [projects, setProjects] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // Fetch projects from MongoDB on component mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/projects');
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Fetched projects from MongoDB:', data);
+          // Convert MongoDB documents to match our local format
+          const formattedProjects = data.map(proj => ({
+            id: proj._id || Date.now(),
+            name: proj.project_name,
+            description: proj.description,
+            category: proj.category,
+            budget: proj.budget,
+            tags: proj.tags,
+            project_status: proj.project_status,
+            dueDate: proj.due_date,
+            archived: false,
+            createdAt: new Date(proj.created_at)
+          }));
+          setProjects(formattedProjects);
+        }
+      } catch (error) {
+        console.error('Error fetching projects from MongoDB:', error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
   return (
-    <Router>
-      <AppContent 
-        projects={projects} 
-        setProjects={setProjects}
-        sidebarCollapsed={sidebarCollapsed}
-        setSidebarCollapsed={setSidebarCollapsed}
-      />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AppContent 
+          projects={projects} 
+          setProjects={setProjects}
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+        />
+      </Router>
+    </ErrorBoundary>
   );
 }
 

@@ -47,6 +47,18 @@ export const Settings = () => {
     taskStatus: ''
   });
 
+  // Get value as string (handle both strings and MongoDB objects)
+  const getValue = (item) => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item.name) return item.name;
+    return '';
+  };
+
+  // Get display name for dropdowns
+  const getDisplayName = (item) => {
+    return getValue(item);
+  };
+
   const ACCENT_COLORS = [
     '#4CAF50', // Green
     '#2196F3', // Blue
@@ -175,14 +187,16 @@ export const Settings = () => {
         })
         .catch(err => console.error('Error adding task status:', err));
     } else {
-      setCRUDList(listName, [...getCRUDList(listName), value]);
+      const currentList = getCRUDList(listName);
+      setCRUDList(listName, [...currentList, value]);
     }
     
     setInputValues(prev => ({ ...prev, [listName]: '' }));
   };
 
   const deleteItem = (listName, index) => {
-    const itemToDelete = getCRUDList(listName)[index];
+    const list = getCRUDList(listName);
+    const itemToDelete = getValue(list[index]);
     
     // For task statuses, also sync with backend
     if (listName === 'taskStatus') {
@@ -197,7 +211,7 @@ export const Settings = () => {
         })
         .catch(err => console.error('Error deleting task status:', err));
     } else {
-      setCRUDList(listName, getCRUDList(listName).filter((_, i) => i !== index));
+      setCRUDList(listName, list.filter((_, i) => i !== index));
     }
   };
 
@@ -215,7 +229,7 @@ export const Settings = () => {
     const newValue = editValues[listName].trim();
     if (!newValue) return;
     const list = getCRUDList(listName);
-    const oldValue = list[index];
+    const oldValue = getValue(list[index]);
     
     // For task statuses, also sync with backend
     if (listName === 'taskStatus') {
@@ -310,7 +324,7 @@ export const Settings = () => {
             >
               <option value="">Select a tag</option>
               {projectTags.map((tag) => (
-                <option key={tag} value={tag}>{tag}</option>
+                <option key={getValue(tag)} value={getValue(tag)}>{getDisplayName(tag)}</option>
               ))}
             </select>
           </div>
@@ -387,7 +401,7 @@ export const Settings = () => {
             >
               <option value="">Select a status</option>
               {taskStatus.map((status) => (
-                <option key={status} value={status}>{status}</option>
+                <option key={getValue(status)} value={getValue(status)}>{getDisplayName(status)}</option>
               ))}
             </select>
           </div>
