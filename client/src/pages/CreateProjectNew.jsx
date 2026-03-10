@@ -160,6 +160,24 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
     });
   };
 
+  // // Task Management
+  // const addTask = (phaseIndex) => {
+  //   const newTask = {
+  //     id: taskIdCounter,
+  //     name: '',
+  //     cost: 0,
+  //     status: 'Active'
+  //   };
+  //   setTaskIdCounter(taskIdCounter + 1);
+  //   setFormData(prev => {
+  //     const newPhases = [...prev.phases];
+  //     newPhases[phaseIndex].tasks.push(newTask);
+  //     newPhases[phaseIndex].total = newPhases[phaseIndex].tasks.reduce((sum, t) => sum + parseFloat(t.cost || 0), 0);
+  //     return { ...prev, phases: newPhases };
+  //   });
+  // };
+
+
   // Task Management
   const addTask = (phaseIndex) => {
     const newTask = {
@@ -171,8 +189,14 @@ export const CreateProjectNew = ({ onProjectCreate }) => {
     setTaskIdCounter(taskIdCounter + 1);
     setFormData(prev => {
       const newPhases = [...prev.phases];
-      newPhases[phaseIndex].tasks.push(newTask);
-      newPhases[phaseIndex].total = newPhases[phaseIndex].tasks.reduce((sum, t) => sum + parseFloat(t.cost || 0), 0);
+      // Create a copy of the phase and tasks to avoid mutation
+      newPhases[phaseIndex] = {
+        ...newPhases[phaseIndex],
+        tasks: [...newPhases[phaseIndex].tasks, newTask]
+      };
+      newPhases[phaseIndex].total = newPhases[phaseIndex].tasks.reduce(
+        (sum, t) => sum + parseFloat(t.cost || 0), 0
+      );
       return { ...prev, phases: newPhases };
     });
   };
